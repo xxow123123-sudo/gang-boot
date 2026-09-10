@@ -121,6 +121,18 @@ class AttendancePanelView(discord.ui.View):
         if not ok:await i.response.send_message('سجل دخولك أولًا.',ephemeral=True);return
         await i.response.send_message('😴 بدأت الغفوة وتوقف احتساب الوقت مؤقتًا.' if state=='break' else '🟢 انتهت الغفوة وعاد احتساب الوقت.',ephemeral=True)
         if i.guild:await refresh_status(self.bot,i.guild,True);await refresh_staff(self.bot,i.guild,True)
+    @discord.ui.button(label='عرض ساعاتي',emoji='🕒',style=discord.ButtonStyle.primary,custom_id='attendance:hours:v1')
+    async def hours(self,i,b):
+        if not await self.emp(i):return
+        total=await self.bot.db.total_seconds(i.user.id,True)
+        state='غير مسجل دخول'
+        for session in await self.bot.db.sessions():
+            if int(session['user_id'])==i.user.id:
+                state='في غفوة 😴' if session['state']=='break' else 'مسجل دخول 🟢'
+                break
+        e=discord.Embed(title='🕒 ساعاتي',description=f'{i.user.mention}\n\n**إجمالي ساعاتك:** {fmt(total)}\n**حالتك الحالية:** {state}')
+        e.set_footer(text='يشمل الإجمالي الجلسة الحالية ويستثني وقت الغفوة.')
+        await i.response.send_message(embed=e,ephemeral=True)
     @discord.ui.button(label='خروج إجباري',emoji='⛔',style=discord.ButtonStyle.danger,custom_id='attendance:force:v4')
     async def force(self,i,b):
         if not isinstance(i.user,discord.Member) or not await self.bot.is_attendance_admin(i.user):await i.response.send_message('⛔ هذا الزر للإدارة فقط.',ephemeral=True);return

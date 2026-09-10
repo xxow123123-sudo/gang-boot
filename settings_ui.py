@@ -392,7 +392,7 @@ class WorkshopSettings(discord.ui.View):
     async def reset(self,i,b):
         await i.response.send_message('⚠️ هل تريد تصفير ترتيب أكثر المتفاعلين للورش؟',view=WorkshopResetConfirm(self.bot,i.user.id),ephemeral=True)
 
-async def attendance_embed(bot):return discord.Embed(title='🕒 إعدادات الدخول والخروج',description=f"رتب الموظفين: **{len(ids(await bot.db.get_setting('attendance_employee_role_ids','[]')))}**\nرتب الإدارة: **{len(ids(await bot.db.get_setting('attendance_admin_role_ids','[]')))}**\nاضبط الرتب والرومات ونص اللوحة ثم انشر اللوحات.")
+async def attendance_embed(bot):return discord.Embed(title='🕒 إعدادات الدخول والخروج',description=f"رتب الموظفين: **{len(ids(await bot.db.get_setting('attendance_employee_role_ids','[]')))}**\nرتب الإدارة: **{len(ids(await bot.db.get_setting('attendance_admin_role_ids','[]')))}**\nلوحة الأعضاء والساعات لها روم مستقل ويمكن تغييره من **الرومات**.\nإعداداتك الحالية محفوظة ولا تحتاج لإعادتها.")
 class AttPanelModal(discord.ui.Modal,title='لوحة الحضور'):
     def __init__(self,bot,title,desc,image):
         super().__init__();self.bot=bot;self.titlex=discord.ui.TextInput(label='العنوان',default=title[:256]);self.desc=discord.ui.TextInput(label='النص',default=desc[:4000],style=discord.TextStyle.paragraph,max_length=4000);self.image=discord.ui.TextInput(label='رابط الصورة (اختياري)',default=image[:1000],required=False,max_length=1000);[self.add_item(x) for x in(self.titlex,self.desc,self.image)]
@@ -420,7 +420,7 @@ class AChannel(discord.ui.ChannelSelect):
     async def callback(self,i):await self.bot.db.set_setting(self.key,self.values[0].id);await i.response.send_message(f'✅ تم تحديد {self.values[0].mention}',ephemeral=True)
 class ChannelView(discord.ui.View):
     def __init__(self,bot):
-        super().__init__(timeout=900);self.bot=bot;self.add_item(AChannel(bot,'attendance_panel_channel_id','روم لوحة الدخول والخروج',0));self.add_item(AChannel(bot,'attendance_status_channel_id','روم المسجلين والغفوة',1));self.add_item(AChannel(bot,'staff_board_channel_id','روم لوحة الموظفين والساعات',2));self.add_item(AChannel(bot,'staff_log_channel_id','روم لوق الموظفين والرسائل',3));self.add_item(HomeButton(bot,4))
+        super().__init__(timeout=900);self.bot=bot;self.add_item(AChannel(bot,'attendance_panel_channel_id','روم لوحة الدخول والخروج',0));self.add_item(AChannel(bot,'attendance_status_channel_id','روم المسجلين والغفوة',1));self.add_item(AChannel(bot,'staff_board_channel_id','روم لوحة الأعضاء والساعات (مستقل)',2));self.add_item(AChannel(bot,'staff_log_channel_id','روم لوق الموظفين والرسائل',3));self.add_item(HomeButton(bot,4))
     @discord.ui.button(label='رجوع',style=discord.ButtonStyle.secondary,row=4)
     async def back(self,i,b):await i.response.edit_message(embed=await attendance_embed(self.bot),view=AttendanceSettings(self.bot))
 

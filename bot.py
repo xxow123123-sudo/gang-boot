@@ -283,6 +283,9 @@ async def on_ready():
             gb = bot.for_guild(guild.id)
             await events.publish(gb, guild)
             await tickets.refresh_panel(gb, guild, False)
+            # Refresh the existing attendance panel too so new buttons appear
+            # automatically without asking the server to redo its settings.
+            await attendance.refresh_panel(gb, guild, False)
             await attendance.refresh_status(gb, guild, False)
             await attendance.refresh_staff(gb, guild, False)
             await warehouses.refresh_panel(gb, guild, False)
